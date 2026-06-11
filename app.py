@@ -11,12 +11,8 @@ import plotly.express as px
 import plotly.io as pio
 import streamlit.components.v1 as components
 
-# ==========================================
-# 1. KONFIGURASI HALAMAN & TEMA DARK SPOTIFY
-# ==========================================
 st.set_page_config(page_title="Spotify Analytics Dashboard", page_icon="🎵", layout="wide")
 
-# Palet warna Spotify
 SPOTIFY_GREEN = "#1DB954"
 SPOTIFY_GREEN_LIGHT = "#1ED760"
 BG_DARK = "#121212"
@@ -349,9 +345,6 @@ st.markdown("""
 
 </style>
 """, unsafe_allow_html=True)
-# ==========================================
-# 2. LOAD DATA
-# ==========================================
 
 def kalkulasi_manual_valence(dataframe, mode_pilihan):
     """
@@ -421,7 +414,6 @@ def format_miliar_juta(angka):
     return f"{angka:,.0f}"
 
 
-# ===== TEMA PLOTLY DARK SPOTIFY =====
 def apply_custom_theme(fig):
     fig.update_layout(
         template="plotly_dark",
@@ -439,9 +431,6 @@ def apply_custom_theme(fig):
     return fig
 
 
-# ==========================================
-# 3. SIDEBAR
-# ==========================================
 st.sidebar.markdown(f"<h2 style='color:{SPOTIFY_GREEN}; margin-bottom:0;'>🎵 Spotify Analitycs</h2>", unsafe_allow_html=True)
 st.sidebar.markdown(f"<p style='color:{TEXT_MUTED}; font-size:13px; margin-top:4px;'>Haris Sandy Setiawan- 09020624033</p>", unsafe_allow_html=True)
 st.sidebar.markdown(f"<p style='color:{TEXT_MUTED}; font-size:13px; margin-top:4px;'>M. Resa Alfarizi - 09010624011</p>", unsafe_allow_html=True)
@@ -487,7 +476,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- DAFTAR MENU ---
 list_menu = [
     "Welcome Screen",
     "Top 10 Lagu Terpopuler",
@@ -498,31 +486,23 @@ list_menu = [
     "Distribusi Kecepatan Musik (BPM)"
 ]
 
-# Inisialisasi session state untuk navigasi jika belum ada
 if 'nav_menu' not in st.session_state:
     st.session_state.nav_menu = "Welcome Screen"
 
-# Cari indeks menu saat ini agar posisi radio button sinkron secara dinamis
 indeks_sekarang = list_menu.index(st.session_state.nav_menu) if st.session_state.nav_menu in list_menu else 0
 
 menu_pilihan = st.sidebar.radio(
     "Navigasi:",
     list_menu,
-    index=indeks_sekarang, # Menjaga posisi radio button sesuai state terbaru
+    index=indeks_sekarang,
     label_visibility="collapsed"
 )
 
-# Sinkronisasi balik jika user mengklik langsung di sidebar radio
 st.session_state.nav_menu = menu_pilihan
 
 st.sidebar.markdown("---")
 st.sidebar.caption("⚡ Powered by Streamlit & Plotly")
 
-# ==========================================
-# 📊 4. LOGIKA HALAMAN UTAMA (100% LENGKAP TANPA POTONGAN)
-# ==========================================
-
-# --- MENU: WELCOME SCREEN ---
 if menu_pilihan == "Welcome Screen":
     
     # 1. HERO BOX UTAMA
@@ -553,20 +533,18 @@ if menu_pilihan == "Welcome Screen":
         </style>
     """, unsafe_allow_html=True)
     
-    # KETIKA TOMBOL DIKLIK:
     if st.button("Mulai Eksplorasi"):
-        st.session_state.nav_menu = "Top 10 Lagu Terpopuler" # Harus sama persis dengan teks menu
-        st.rerun() # Memaksa streamlit merender ulang dengan state menu yang baru
+        st.session_state.nav_menu = "Top 10 Lagu Terpopuler" 
+        st.rerun() 
         
-    st.markdown(" ") # Spacer jembatan antar komponen
+    st.markdown(" ") 
     
-    # Hitung nilai asli dari DataFrame agar dinamis
+
     total_lagu = len(df)
     total_artis = df['artist(s)_name'].str.split(', ').explode().dropna().unique()
     total_artis_count = len(total_artis) if len(total_artis) > 0 else df['artist(s)_name'].nunique()
     modus_bpm = int(df['bpm'].mode()[0]) if 'bpm' in df.columns and not df['bpm'].mode().empty else 123
 
-    # --- Tambahan CSS: Efek Hover Glow yang Lebih Tebal & Menyala Pekat ---
     st.markdown("""
         <style>
             /* Efek transisi halus dan pergerakan kartu saat di-hover */
@@ -604,7 +582,6 @@ if menu_pilihan == "Welcome Screen":
         </style>
     """, unsafe_allow_html=True)
 
-    # # 2. 3 KARTU METRIK UTAMA DENGAN EFEK HOVER NYALA TEBAL
     col_w1, col_w2, col_w3 = st.columns(3)
     
     with col_w1:
@@ -645,7 +622,7 @@ if menu_pilihan == "Welcome Screen":
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.success("📊 Dashboard ini menyajikan berbagai visualisasi interaktif untuk mengeksplorasi pola, tren, dan karakteristik data Spotify 2023. Gunakan menu navigasi di sebelah kiri untuk melakukan analisis pada setiap aspek data yang tersedia.") 
-# --- MENU 1: TOP 10 LAGU TERPOPULER & GARIS WAKTU ---
+
 elif menu_pilihan == "Top 10 Lagu Terpopuler":
     st.title("Popularity Metrics & Time Series Dispersion")
     
@@ -718,7 +695,7 @@ elif menu_pilihan == "Top 10 Lagu Terpopuler":
             f" Hal ini menjadi bukti nyata bahwa jumlah pengguna internet dan aplikasi musik digital di seluruh dunia meningkat sangat pesat, sehingga memudahkan lagu-lagu baru untuk langsung populer dalam waktu singkat."
         )
 
-# --- MENU 2: PLATFORM BATTLEGROUND ---
+
 elif menu_pilihan == "Platform Battleground":
     st.title("⚔️ Platform Battleground & Cross-App Analytics")
     
@@ -742,13 +719,12 @@ elif menu_pilihan == "Platform Battleground":
             data_plot_final = data_filtered[data_filtered['track_name'] == lagu_spesifik].iloc[0]
             judul_grafik = f"Posisi Tangga Lagu: {lagu_spesifik} ({pilihan_user})"
         else:
-            lagu_spesifik = pilihan_user  # Definisikan agar variabel tetap terbaca di bawah
+            lagu_spesifik = pilihan_user  
             data_plot_final = data_filtered.iloc[0]
             judul_grafik = f"Posisi Tangga Lagu untuk '{pilihan_user}'"
 
         st.markdown(f"### 📊 {judul_grafik}")
         
-        # Konversi super aman untuk menghindari galat objek kosong/None
         def dapatkan_nilai_numerik(kolom):
             nilai = data_plot_final.get(kolom, 0)
             if pd.isna(nilai) or nilai is None:
@@ -763,24 +739,22 @@ elif menu_pilihan == "Platform Battleground":
         val_deezer = dapatkan_nilai_numerik('in_deezer_charts')
         val_shazam = dapatkan_nilai_numerik('in_shazam_charts')
         
-        # =====================================================================
-        # LOGIKA PROSES GRAFIK LEADERBOARD (Makin Kecil Peringkat, Makin Tinggi Bar)
-        # =====================================================================
-        BATAS_ATAS_CHART = 100  # Menjadi acuan tinggi maksimal chart (Top 100)
 
-        # Fungsi hitung tinggi batang
+        BATAS_ATAS_CHART = 100  
+
+   
         def hitung_skor_grafik(peringkat):
             if peringkat == 0:
                 return 0
             if peringkat > BATAS_ATAS_CHART:
-                return 1  # Tetap muncul batang sangat pendek jika di luar top 100
+                return 1  
             return (BATAS_ATAS_CHART + 1) - peringkat
 
-        # Fungsi penulisan label teks di atas batang
+
         def buat_label_teks(peringkat):
             return "-" if peringkat == 0 else f"#{peringkat}"
 
-        # Eksekusi logika untuk masing-masing platform
+
         df_chart_compare = pd.DataFrame({
             'Platform Aplikasi': ['Spotify Charts', 'Apple Music Charts', 'Deezer Charts', 'Shazam Charts'],
             'Tinggi Batang': [
@@ -797,7 +771,6 @@ elif menu_pilihan == "Platform Battleground":
             ]
         })
         
-        # Gambar grafik menggunakan kolom bayangan 'Tinggi Batang' dan teks 'Peringkat Asli'
         fig_battle = px.bar(
             df_chart_compare, 
             x='Platform Aplikasi', 
@@ -812,20 +785,19 @@ elif menu_pilihan == "Platform Battleground":
             }
         )
         
-        # Modifikasi layout dasar: Sembunyikan angka sumbu Y agar tidak membingungkan
         fig_battle.update_layout(
             showlegend=False, 
             height=400,
             yaxis=dict(
                 title="Posisi Tangga Lagu",
-                showticklabels=False,  # Sembunyikan angka skor buatan matematika
-                showgrid=False         # Bersihkan garis horizontal belakang
+                showticklabels=False,  
+                showgrid=False         
             )
         )
         
-        # Paksa posisi teks peringkat selalu berada tepat di luar/atas batang
+     
         fig_battle.update_traces(textposition='outside')
-        # =====================================================================
+        
         
         try:
             fig_battle = apply_custom_theme(fig_battle)
@@ -835,12 +807,11 @@ elif menu_pilihan == "Platform Battleground":
         fig_battle_html = pio.to_html(fig_battle, full_html=False, include_plotlyjs='cdn')
         components.html(fig_battle_html, height=450, scrolling=False)
 
-        # --- POTONGAN KODE SETELAH components.html(fig_battle_html, height=450, scrolling=False) ---
-
+       
         st.markdown("---")
         st.markdown("### 📝 Kesimpulan Analisis Platform")
 
-        # Buat dictionary untuk mempermudah pemetaan nilai valid (bukan 0)
+       
         peta_posisi = {
             'Spotify': val_spotify,
             'Apple Music': val_apple,
@@ -848,30 +819,29 @@ elif menu_pilihan == "Platform Battleground":
             'Shazam': val_shazam
         }
 
-        # Filter platform tempat lagu ini benar-benar masuk chart (posisi > 0)
         chart_aktif = {k: v for k, v in peta_posisi.items() if v > 0}
 
         if chart_aktif:
-            # Cari posisi terbaik (angka terkecil, misal peringkat 1 lebih bagus dari 50)
+            
             platform_terbaik = min(chart_aktif, key=chart_aktif.get)
             posisi_terbaik = chart_aktif[platform_terbaik]
             
-            # Hitung total platform yang berhasil ditembus
+            
             total_platform = len(chart_aktif)
 
-            # Siapkan teks narasi dinamis
+            
             nama_lagu = lagu_spesifik
             
             st.success(f"🎵 Lagu **{nama_lagu}** menunjukkan performa yang menarik di berbagai platform streaming!")
             
-            # Tampilkan kesimpulan berbasis poin agar scannable
+            
             col1, col2 = st.columns(2)
             with col1:
                 st.metric(label="🏆 Performa Terbaik", value=f"#{posisi_terbaik}", delta=platform_terbaik, delta_color="off")
             with col2:
                 st.metric(label="🌐 Dominasi Platform", value=f"{total_platform} / 4", delta="Platform Aktif", delta_color="off")
 
-            # Detail Kesimpulan Kualitatif
+            
             st.markdown(f"""
             > **Insight Utama:**
             > * Lagu ini paling sukses merajai **{platform_terbaik}** dengan berhasil menduduki peringkat **#{posisi_terbaik}**.
@@ -879,13 +849,13 @@ elif menu_pilihan == "Platform Battleground":
             """)
             
         else:
-            # Jika semua nilai val_* adalah 0
+           
             st.info("ℹ️ **Informasi:** Lagu ini saat ini belum terdaftar atau sudah keluar dari top tangga lagu (posisi 0) di keempat platform utama tersebut.")
 
     else:
         st.warning("⚠️ Data tidak ditemukan untuk pencarian tersebut. Silakan coba filter lain.")
 
-    # SUNTIKKAN STYLESHEET DARURAT PEMBUNUH MASSAL TEKS UNDEFINED
+    
     st.markdown("""
         <style>
             /* Menyembunyikan paksa tulisan teks telanjang berbau undefined di dalam kontainer grafik */
@@ -905,7 +875,7 @@ elif menu_pilihan == "Platform Battleground":
         </style>
     """, unsafe_allow_html=True)
 
-# --- MENU 3: COLLABORATION ROI CALCULATOR ---
+
 elif menu_pilihan == "Collaboration ROI Calculator":
     st.title("💰 Collaboration ROI & Personnel Optimization Hub")
     st.markdown("""
@@ -913,9 +883,7 @@ elif menu_pilihan == "Collaboration ROI Calculator":
     formasi jumlah penyanyi mana yang paling ideal, konsisten, dan menguntungkan di industri musik digital dunia.
     """)
     
-    # =========================================================================
-    # REVISI: SEGMEN KONTROL TAHUN DIHAPUS, BERFOKUS PADA FILTER ARTIS & MUSIK
-    # =========================================================================
+   
     st.sidebar.subheader("⚙️ Segment Kontrol")
     
     nama_kolom_artis = 'artist(s)_name'
@@ -927,18 +895,15 @@ elif menu_pilihan == "Collaboration ROI Calculator":
     st.sidebar.markdown("🔍 **Filter Spesifik** *(Kosongkan untuk Semua Data)*")
     filter_artis = st.sidebar.multiselect("Pilih Artis:", options=daftar_artis)
     filter_lagu = st.sidebar.multiselect("Pilih Judul Lagu:", options=daftar_lagu)
-    # =========================================================================
+   
     
     st.markdown("##### 📱 Select Streaming Ecosystem Network:")
     platform_terpilih = st.segmented_control("Pilih Platform Analisis:", options=["Spotify", "Apple Music", "Deezer"], default="Spotify", label_visibility="collapsed")
     st.markdown(" ") 
     
-    # Menggunakan salinan data awal secara utuh (karena filter tahun sudah ditiadakan)
-    df_roi = df.copy()
     
-    # =========================================================================
-    # EKSEKUSI FILTER BERDASARKAN INPUT USER
-    # =========================================================================
+    df_roi = df.copy()
+
     if filter_artis:
         df_roi = df_roi[df_roi[nama_kolom_artis].isin(filter_artis)]
         
@@ -953,7 +918,7 @@ elif menu_pilihan == "Collaboration ROI Calculator":
             
     df_roi['Format Tampil'] = df_roi['artist_count'].apply(kelompokkan_format)
     
-    # Validasi jika data kosong setelah difilter
+    
     if df_roi.empty:
         st.warning("⚠️ Data tidak ditemukan untuk kombinasi filter tersebut. Silakan atur ulang filter Anda pada sidebar.")
     else:
@@ -1022,37 +987,37 @@ elif menu_pilihan == "Collaboration ROI Calculator":
             f" Referensi pengambilan data harga per stream di setiap platform nya diambil di https://producerhive.com/music-marketing-tips/streaming-royalties-breakdown/#ftoc-heading-16"
         )
 
-# --- MENU 5: ANATOMI SEBUAH LAGU GLOBAL HIT (VERSI FILTER BERTINGKAT) ---
+
 elif menu_pilihan == "Anatomi Sebuah Lagu Global Hit":
     st.title("🧠 Audio Fingerprint Comparison (Perbandingan Akustik Lagu)")
     st.markdown("Pilih seorang musisi untuk langsung membandingkan sidik jari akustik (*acoustic fingerprint*) dari seluruh karya lagu mereka yang masuk ke dalam dataset global hits.")
     
-    # --- 1. DATA PREPARATION ---
+   
     audio_features = ['danceability_%', 'valence_%', 'energy_%', 'acousticness_%', 'instrumentalness_%', 'liveness_%', 'speechiness_%']
     
-    # Bersihkan data dari null values pada kolom nama lagu dan artis
+    
     df_clean = df.dropna(subset=['track_name', 'artist(s)_name']).copy()
     
-    # Pecah artis jika ada kolaborasi (split by ', ') agar nama artis individu tetap terdata
+    
     list_all_artists = df_clean['artist(s)_name'].str.split(', ').explode().dropna().unique()
     list_all_artists = sorted(list_all_artists)
     
     st.markdown("### 🔍 Filter Target Komparasi")
     
-    # 1. Filter Pertama: Pilih Nama Artis (Paling Atas) - Urutan asli tetap terjaga
+    
     artis_terpilih = st.selectbox(
         "1. Pilih Nama Artis / Musisi:",
         options=list_all_artists,
         index=0 if len(list_all_artists) > 0 else None
     )
     
-    # Saring data awal berdasarkan nama artis yang dipilih
+    
     df_filtered_artist = df_clean[df_clean['artist(s)_name'].str.contains(artis_terpilih, case=False, na=False)].copy()
     
-    # 2. Filter Kedua: Pilih Lagu
+   
     list_lagu_artis = sorted(df_filtered_artist['track_name'].unique())
     
-    # PERBAIKAN DI SINI: default diubah menjadi [] agar awal-awal tidak otomatis memilih semua lagu (kosong)
+    
     lagu_terpilih = st.multiselect(
         f"2. Pilih Lagu dari {artis_terpilih}:",
         options=list_lagu_artis,
@@ -1060,15 +1025,15 @@ elif menu_pilihan == "Anatomi Sebuah Lagu Global Hit":
         placeholder="Silakan klik atau ketik di sini untuk memilih lagu yang ingin dibandingkan..."
     )
     
-    # Filter akhir berdasarkan lagu yang dipilih user di multi-select
+    
     df_filtered_songs = df_filtered_artist[df_filtered_artist['track_name'].isin(lagu_terpilih)].copy()
     
-    # LOGIKA PENGKONDISIAN: Jika user belum memilih lagu apa pun
+    
     if df_filtered_songs.empty:
         st.info(f"💡 Kolom pilihan lagu di atas masih kosong. Silakan pilih satu atau beberapa lagu dari **{artis_terpilih}** untuk menampilkan grafik radar perbandingan.")
         
     else:
-        # --- 2. TRANSFORMAST DATA (MELTING) UNTUK RADAR CHART ---
+        
         df_melted = df_filtered_songs.melt(
             id_vars=['track_name', 'artist(s)_name'],
             value_vars=audio_features,
@@ -1076,10 +1041,10 @@ elif menu_pilihan == "Anatomi Sebuah Lagu Global Hit":
             value_name='Nilai (%)'
         )
         
-        # Merapikan nama karakteristik audio agar indah dilihat
+        
         df_melted['Karakteristik Audio'] = df_melted['Karakteristik Audio'].str.replace('_%', '').str.title()
         
-        # --- 3. VISUALISASI UTAMA: MULTI-LINE RADAR CHART ---
+       
         total_lagu = len(df_filtered_songs)
         
         fig_radar = px.line_polar(
@@ -1091,7 +1056,7 @@ elif menu_pilihan == "Anatomi Sebuah Lagu Global Hit":
             title=f"Sidik Jari Akustik: Perbandingan {total_lagu} Lagu oleh {artis_terpilih}"
         )
         
-        # Efek fill transparan jika lagunya tidak terlalu banyak (agar tidak merusak visual)
+        
         if total_lagu <= 3:
             fig_radar.update_traces(fill='toself', opacity=0.3)
             
@@ -1106,38 +1071,38 @@ elif menu_pilihan == "Anatomi Sebuah Lagu Global Hit":
             
         st.plotly_chart(fig_radar, use_container_width=True)
         
-        # --- 4. TABEL RINCIAN FITUR AUDIO (INDEX ANGKA KIRI DIHAPUS) ---
+       
         st.markdown(f"### 📋 Rincian Nilai Akustik")
         
         df_tabel_komparasi = df_filtered_songs[['track_name', 'artist(s)_name'] + audio_features].copy()
         df_tabel_komparasi.columns = ['Judul Lagu', 'Artis/Kolaborator', 'Danceability', 'Valence', 'Energy', 'Acousticness', 'Instrumentalness', 'Liveness', 'Speechiness']
         
-        # Tetap menyembunyikan angka index 0, 1, 2 agar rapi
+        
         st.dataframe(df_tabel_komparasi, use_container_width=True, hide_index=True)
         
-        # --- 5. PENAMBAHAN: HASIL ANALISIS OTOMATIS ---
+       
         st.markdown("---")
         st.markdown(f"### 💡 Analisis Karakteristik Akustik ({artis_terpilih})")
         
-        # Mengambil insight otomatis jika lagu yang dipilih lebih dari atau sama dengan 1
+        
         with st.container():
-            # 1. Lagu Paling Energik & Paling Kalem
+        
             lagu_energi_max = df_tabel_komparasi.loc[df_tabel_komparasi['Energy'].idxmax()]['Judul Lagu']
             nilai_energi_max = df_tabel_komparasi['Energy'].max()
             
-            # 2. Lagu Paling Ceria (Valence tinggi menunjukkan rasa bahagia/positif)
+            
             lagu_valence_max = df_tabel_komparasi.loc[df_tabel_komparasi['Valence'].idxmax()]['Judul Lagu']
             nilai_valence_max = df_tabel_komparasi['Valence'].max()
             
-            # 3. Lagu Paling Enak Dibuat Joget (Danceability)
+           
             lagu_dance_max = df_tabel_komparasi.loc[df_tabel_komparasi['Danceability'].idxmax()]['Judul Lagu']
             nilai_dance_max = df_tabel_komparasi['Danceability'].max()
             
-            # 4. Lagu Paling Akustik / Organik
+           
             lagu_acoustic_max = df_tabel_komparasi.loc[df_tabel_komparasi['Acousticness'].idxmax()]['Judul Lagu']
             nilai_acoustic_max = df_tabel_komparasi['Acousticness'].max()
 
-            # Tampilan Output Menggunakan Kolom Berjejer (Metrik Utama)
+            
             col1, col2 = st.columns(2)
             with col1:
                 st.info(f"🕺 **Paling Danceable:**\n\nLagu **\"{lagu_dance_max}\"** memiliki skor kecocokan berdansa tertinggi sebesar **{nilai_dance_max}%**.")
@@ -1147,7 +1112,7 @@ elif menu_pilihan == "Anatomi Sebuah Lagu Global Hit":
                 st.warning(f"☀️ **Paling Ceria/Positif (Valence):**\n\nLagu **\"{lagu_valence_max}\"** membawa nuansa paling bahagia di dataset ini dengan skor **{nilai_valence_max}%**.")
                 st.error(f"🎸 **Paling Akustik:**\n\nLagu **\"{lagu_acoustic_max}\"** mendominasi instrumen organik/akustik murni dengan skor **{nilai_acoustic_max}%**.")
             
-# --- MENU 6: POLA RILIS MUSIK MUSIMAN ---
+
 elif menu_pilihan == "Pola Rilis Musik Musiman":
     st.title("🍂 Seasonal Release Patterns & Calendar Heatmap")
     st.markdown("Analisis ini mendeteksi strategi penanggalan rilis atau perilaku serentak (*herd behavior*) musisi besar dunia.")
@@ -1165,11 +1130,11 @@ elif menu_pilihan == "Pola Rilis Musik Musiman":
     id_bulan_terpadat = df_bulan_saja.loc[df_bulan_saja['Total'].idxmax()]['released_month']
     nama_bulan_terpadat = nama_bulan[id_bulan_terpadat].split('. ')[1]
     
-    # 🛠️ PERBAIKAN: Hitung nilai modus dari kolom bpm agar variabel 'bpm_modus' terdefinisi dan tidak error
+    
     if 'bpm' in df.columns and not df['bpm'].dropna().empty:
         bpm_modus = df['bpm'].mode()[0]
     else:
-        bpm_modus = 120 # Nilai fallback/cadangan jika kolom bpm tidak ditemukan
+        bpm_modus = 120 
     
     st.markdown("### 💡 Kesimpulan Analisis Pola Rilis Musiman:")
     st.info(
@@ -1181,39 +1146,37 @@ elif menu_pilihan == "Pola Rilis Musik Musiman":
         f"**menghindari** rilis di tanggal-tanggal super padat tersebut agar tidak tenggelam oleh persaingan promosi dari label-label raksasa."
     )
 
-    # Variabel bpm_modus sekarang sudah aman dipanggil di bawah ini tanpa memicu NameError lagi
+    
     st.info(f"**💡 Kesimpulan Analisis Data:** Berdasarkan grafik data Spotify yang kita miliki dan didukung oleh temuan Dyer & McKune (2013), penonton global terbukti lebih memilih musik yang menjaga keseimbangan psikologis mereka. Puncak kurva yang berada di area **{bpm_modus:.0f} BPM** menunjukkan bahwa popularitas sebuah lagu hits sangat dipengaruhi oleh bagaimana ritme (BPM) tersebut beresonansi dengan kenyamanan biologis tubuh manusia.")
-# --- MENU 7: DISTRIBUSI KECEPATAN MUSIK (BPM) ---
+
 elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
     st.title("🥁 Acoustic Velocity Distribution & Psychophysiological Rhythm")
     st.markdown("Mengukur letak puncak *sweet spot* ritme kecepatan tempo musik hits dunia berdasarkan respons kenyamanan biologis.")
     
-    # Memastikan kolom penting dibersihkan dan diubah menjadi tipe numerik
+    
     df['bpm'] = pd.to_numeric(df['bpm'], errors='coerce')
     df['streams'] = pd.to_numeric(df['streams'], errors='coerce')
     
-    # Membuat kolom nama lagu yang bersih untuk pencarian filter grafik
+  
     nama_kolom_lagu = 'track_name'
     df[nama_kolom_lagu] = df[nama_kolom_lagu].astype(str).str.strip()
     
     df_bpm_hist = df.dropna(subset=['bpm', 'streams']).copy()
     
-    # ===== REVISI PERHITUNGAN METRIK: TERTINGGI, TERENDAH, MODUS =====
+   
     bpm_tertinggi = df_bpm_hist['bpm'].max()
     bpm_terendah = df_bpm_hist['bpm'].min()
     bpm_median = df_bpm_hist['bpm'].median()
     bpm_modus = df_bpm_hist['bpm'].mode()[0] if not df_bpm_hist['bpm'].mode().empty else bpm_median
     
-    # Menampilkan metrik ke dalam kolom
+   
     col_stat1, col_stat2, col_stat3 = st.columns(3)
     col_stat1.metric("Tempo Tertinggi (Max)", f"{bpm_tertinggi:.0f} BPM")
     col_stat2.metric("Tempo Terendah (Min)", f"{bpm_terendah:.0f} BPM")
     col_stat3.metric("Titik Terbanyak (Modus)", f"{bpm_modus:.0f} BPM")
     st.markdown("---")
     
-    # =========================================================================
-    # KONTROL FILTER: UNTUK MENANDAI LAGU PADA GRAFIK GLOBAL
-    # =========================================================================
+    
     st.markdown("🔍 **Sorot Posisi BPM Lagu Spesifik pada Kurva**")
     daftar_lagu_grafik = sorted(df_bpm_hist[nama_kolom_lagu].unique())
     filter_lagu_grafik = st.multiselect(
@@ -1221,9 +1184,9 @@ elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
         options=daftar_lagu_grafik,
         placeholder="Ketik nama lagu di sini... (Bisa pilih lebih dari satu)"
     )
-    # =========================================================================
     
-    # GRAFIK MUTLAK: Selalu menampilkan seluruh sebaran histogram dari awal sampai akhir
+    
+   
     fig_hist = px.histogram(
         df_bpm_hist, 
         x='bpm', 
@@ -1233,19 +1196,17 @@ elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
         color_discrete_sequence=['#1DB954']
     )
     
-    # Menamai data dasar histogram di legenda agar rapi
+    
     fig_hist.data[0].name = "Distribusi Global"
     fig_hist.data[0].showlegend = True
 
-    # MEMBERIKAN GARIS TEPI (BORDER) PADA SETIAP BATANG HISTOGRAM
+    
     fig_hist.update_traces(
         marker_line_color='#121212', 
         marker_line_width=1.5
     )
     
-    # =========================================================================
-    # SOLUSI AGAR TIDAK NABRAK: MEMINDAHKAN LABEL KE LEGENDA INTERAKTIF
-    # =========================================================================
+    
     if filter_lagu_grafik:
         warna_penanda = ['#FF4B4B', '#00DF89', '#3182CE', '#D69E2E', '#9F7AEA', '#ED64A6']
         
@@ -1255,7 +1216,7 @@ elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
                 bpm_lagu = data_lagu['bpm'].values[0]
                 warna_aktif = warna_penanda[idx % len(warna_penanda)]
                 
-                # 1. Menambahkan garis vertikal murni
+                
                 fig_hist.add_vline(
                     x=bpm_lagu, 
                     line_dash="dash", 
@@ -1263,7 +1224,7 @@ elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
                     line_width=2
                 )
                 
-                # 2. Menambahkan trace dummy khusus untuk legenda
+                
                 import plotly.graph_objects as go
                 fig_hist.add_trace(
                     go.Scatter(
@@ -1275,7 +1236,7 @@ elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
                         hoverinfo='none'
                     )
                 )
-    # =========================================================================
+
                 
     fig_hist.update_layout(
         yaxis_title="Jumlah Judul Lagu Hits", 
@@ -1296,7 +1257,7 @@ elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
     except:
         pass
 
-    # MEMAKSA GARIS KISI LAYOUT (GRIDLINES) TETAP MUNCUL JIKA TERTIMPA THEME
+    
     fig_hist.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(255, 255, 255, 0.05)')
     fig_hist.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(255, 255, 255, 0.05)')
     
@@ -1309,7 +1270,7 @@ elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
     with col_teori2:
         st.warning("🟡 **Rentang di Atas 140 BPM: Zona 'Hyper-Arousal'**\n\nMusik di atas 140 BPM memicu stimulasi berlebih pada otak. Tempo cepat sangat bagus untuk memicu adrenalin instan (musik olahraga), namun jika didengarkan terus-menerus akan memicu stres sensorik dan kelelahan mental, menyebabkan grafiknya melandai turun.")
 
-    # ===== TABEL LAGU BERDASARKAN KATEGORI BPM =====
+    
     st.markdown("---")
     st.subheader("🎵 Telusuri Lagu Berdasarkan Kategori Kecepatan Tempo")
 
@@ -1324,7 +1285,7 @@ elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
         label_visibility="collapsed"
     )
 
-    # Inisialisasi variabel rekomendasi aktivitas
+    
     rekomendasi_aktivitas = ""
 
     if bpm_kategori == "BPM ≥ 140 (Hyper Zone)":
@@ -1349,11 +1310,11 @@ elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
             "menjelang **Tidur/Relaksasi**. Tempo lambat membantu menurunkan frekuensi gelombang otak menuju kondisi rileks dan meningkatkan fokus kognitif."
         )
 
-    # Menampilkan rekomendasi aktivitas tepat di bawah pilihan kategori
+   
     st.markdown(f"> {rekomendasi_aktivitas}")
-    st.write("") # Memberi sedikit space kosong
+    st.write("") 
 
-    # KONTROL FILTER JUMLAH BARIS TAMPILAN (TOP ROWS)
+    
     col_tabel_header, col_limit = st.columns([2, 1])
     
     with col_tabel_header:
@@ -1368,10 +1329,10 @@ elif menu_pilihan == "Distribusi Kecepatan Musik (BPM)":
         )
 
     if not df_bpm_tabel.empty:
-        # REVISI: Hanya mengambil kolom nama lagu, nama artis, dan bpm (menghapus streams)
+       
         tabel_bpm = df_bpm_tabel[['track_name', 'artist(s)_name', 'bpm']].copy()
         
-        # REVISI: Mengurutkan dari nilai BPM tertinggi ke terendah (ascending=False)
+        
         tabel_bpm = tabel_bpm.sort_values('bpm', ascending=False).reset_index(drop=True)
         
         if limit_pilihan == "Top 10":
